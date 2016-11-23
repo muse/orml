@@ -1,0 +1,6 @@
+# These are not ready yet, and are thus not pushed.
+doc/
+test/
+
+# Don't send a symlink by accident.
+orml
