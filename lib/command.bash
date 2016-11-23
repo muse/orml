@@ -40,21 +40,6 @@ function _install {
     exit 0
 }
 
-function _help {
-    cat <<-EOF
-        orml command [--opts] [arguments]
-
-        COMMANDS
-            insert  path [--hidden,--as:] [text|file]
-            select  path [--null,--clipboard,--as:]
-            install
-            list
-            hide    path
-            unhide  path
-            drop    path
-    EOF
-}
-
 function _insert {
     REPLY=${ORML_ARGV[1]:-$(_prompt "text, password or file: ")}
     ! _is_file "${ORML_ARGV[0]}"
@@ -145,5 +130,3 @@ function _drop {
             esac ;;
     esac
 }
-
-
