@@ -40,6 +40,43 @@ function _install {
     exit 0
 }
 
+function _export {
+    _is_directory
+    case $? in
+        0)
+            case $? in
+                0)
+                    _compress | _encrypt > "${ORML_ARGV[0]}.gpg"
+                    exit 0 ;;
+                1)
+                    _compress > "${ORML_ARGV[0]}"
+                    exit 0 ;;
+            esac ;;
+        1)
+            echo "$ORML_STORE doesn't exist, try doing $ orml install"
+            exit 1 ;;
+    esac
+}
+
+function _import {
+    _is_directory
+    case $? in
+        0)
+            _is_true "$ORML_OPTS_DECRYPT"
+            case $? in
+                0)
+                    _decrypt < "${ORML_ARGV[0]}" | _decompress
+                    exit 0 ;;
+                1)
+                    _decompress < "${ORML_ARGV[0]}"
+                    exit 0 ;;
+            esac ;;
+        1)
+            echo "$ORML_STORE doesn't exist, try doing $ orml install"
+            exit 1 ;;
+    esac
+}
+
 function _insert {
     REPLY=${ORML_ARGV[1]:-$(_prompt "text, password or file: ")}
     ! _is_file "${ORML_ARGV[0]}"
@@ -48,13 +85,12 @@ function _insert {
             mkdir -p "$ORML_STORE/${ORML_ARGV[0]%/*}"
             {
                 [[ -f "$REPLY" ]] && {
-                    _cipher "encrypt" < "$REPLY"
-                    exit 0
+                    _encrypt < "$REPLY"
                 } || {
-                    _cipher "encrypt" <<< "$REPLY"
-                    exit 1
+                    _encrypt <<< "$REPLY"
                 }
-            } > "$ORML_STORE/${ORML_ARGV[0]%/*}/${ORML_ARGV[0]##*/}" ;;
+            } > "$ORML_STORE/${ORML_ARGV[0]%/*}/${ORML_ARGV[0]##*/}"
+            exit 0 ;;
         1)
             echo "$ORML_STORE/${ORML_ARGV[0]} already exists, use $ orml edit"
             exit 1 ;;
@@ -65,13 +101,14 @@ function _select {
     for ORML_PATH in "${ORML_ARGV[@]}"; do
         _is_hidden "$ORML_PATH"
         case $? in
-            0)  _cipher "decrypt" <<< "$ORML_HIDDEN/$(_hash "$ORML_PATH")"
+            0)
+                _decrypt <<< "$ORML_HIDDEN/$(_hash "$ORML_PATH")"
                 exit 0 ;;
             1)
                 _is_file "$ORML_PATH"
                 case $? in
                     0)
-                        _cipher "decrypt" <<< "$ORML_STORE/$ORML_PATH"
+                        _decrypt <<< "$ORML_STORE/$ORML_PATH"
                         exit 0 ;;
                     1)
                         echo "$ORML_PATH doesn't exist"

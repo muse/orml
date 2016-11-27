@@ -18,6 +18,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+function _is_true {
+    if [[ "$1" = true ]]; then
+        return 0
+    fi; return 1
+}
+
 function _is_file {
     if [[ -f "$ORML_STORE/${1#${ORML_STORE}}" ]]; then
         return 0
@@ -50,7 +56,7 @@ function _confirm {
 }
 
 function _prompt {
-    if [[ "$ORML_OPTS_PASSWORD" ]]; then
+    if _is_true "$ORML_OPTS_PASSWORD"; then
         read -rsp "$1"
     else
         read -rp "$1"
@@ -65,23 +71,34 @@ function _hash {
     fi
 }
 
-function _cipher {
-    if _is_file "$ORML_KEYS"; then
-        ORML_OPTS_AS=${ORML_OPTS_AS:-$(head -1 "$ORML_KEYS")}
-        case "$1" in
-            encrypt)
-                gpg --encrypt -u "$ORML_OPTS_AS" -r "$ORML_OPTS_AS"
-                return 0
-                ;;
-            decrypt)
-                # XXX: We can't decrypt multiple files right now,
-                #   #: --decrypt-files throws a error and I haven't been
-                #   #: able to find the solution.
-                xargs gpg --decrypt --batch --quiet --yes
-                return 0
-                ;;
-        esac
-    fi
-    echo "$ORML_KEYS doesn't exist, try doing $ $ORML_NAME install" 1>2
-    exit 1
+function _compress () (
+    cd "$ORML_STORE" && tar -cf - .
+)
+
+function _decompress () (
+    cd "$ORML_STORE" && tar -xpf -
+)
+
+function _encrypt {
+    _is_file "$ORML_KEYS"
+    case $? in
+        0)
+            gpg --encrypt -u "$ORML_OPTS_AS" -r "$ORML_OPTS_AS"
+            return 0 ;;
+        1)
+            echo "$ORML_KEYS doesn't exist, try doing $ orml install"
+            return 1 ;;
+    esac
+}
+
+function _decrypt {
+    _is_file "$ORML_KEYS"
+    case $? in
+        0)
+            xargs gpg --decrypt --batch --quiet --yes
+            return 0 ;;
+        1)
+            echo "$ORML_KEYS doesn't exist, try doing $ orml install"
+            return 1 ;;
+    esac
 }

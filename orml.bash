@@ -24,7 +24,7 @@ ORML_VERSION="0.1"
 ORML_NAME="$0"
 ORML_RUN="$(dirname $0)"
 ORML_COMMAND="$1"
-ORML_LONG="as:,hidden,force,clipboard,null"
+ORML_LONG="as:,hidden,force,clipboard,null,encrypt,decrypt"
 ORML_SHORT=":"
 ORML_ALLOC="${ORML_ALLOC:-$HOME}"
 ORML_STORE="${ORML_STORE:-$ORML_ALLOC/.orml}"
@@ -32,12 +32,14 @@ ORML_KEYS="${ORML_KEYS:-$ORML_STORE/keys}"
 ORML_TRASH="${ORML_TRASH:-$ORML_STORE/.trash}"
 ORML_HIDDEN="${ORML_HIDDEN:-$ORML_STORE/.hidden}"
 
-ORML_OPTS_AS="$(head -1 "$ORML_KEYS")"
+ORML_OPTS_AS="$(head -1 "$ORML_KEYS" 2> /dev/null)"
 ORML_OPTS_NULL=false
+ORML_OPTS_ENCRYPT=false
+ORML_OPTS_DECRYPT=false
 ORML_OPTS_CLIPBOARD=false
 ORML_OPTS_HIDDEN=false
 
-export GPG_TTY=$(tty)
+export GPG_TTY=$(tty 2> /dev/null)
 
 function _argv {
     # XXX: Validate that OSX users have GNU getopt and not BSD
@@ -51,6 +53,12 @@ function _argv {
             --as)
                 ORML_OPTS_AS="$2"
                 shift 2 ;;
+            --encrypt)
+                ORML_OPTS_ENCRYPT=true
+                shift 1 ;;
+            --decrypt)
+                ORML_OPTS_DECRYPT=true
+                shift 1 ;;
             --hidden)
                 ORML_OPTS_HIDDEN=true
                 shift 1 ;;
@@ -97,11 +105,11 @@ function _argv {
     #   #: The next step however is to actually pass this variable to the
     #   #: commands so we can use the arguments ($n) instead of the
     #   #: variable (OMRL_ARGV[n]).
-    ORML_ARGV=${ORML_ARGV:-"$@"}
+    ORML_ARGV=($@)
 }
 
 case "$ORML_COMMAND" in
-    help|list|install|insert|select|hide|unhide|drop)
+    help|import|export|list|install|insert|select|hide|unhide|drop)
         _argv "$@" && "_${ORML_COMMAND}" ;;
     *)
         echo "$ORML_COMMAND isn't a valid command, try $ orml help"

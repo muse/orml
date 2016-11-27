@@ -50,11 +50,13 @@ convenient to have.
       The tests will be in `test` after cloning and will be exclusive to being ran
       in the cloned directory (for now).
 
-- [ ] I feel like the `_cipher` function can be enhanced.
+- [X] I feel like the `_cipher` function can be enhanced.
 
 - [ ] Implement the existing and possibly new flags.
-      - [x] `--as        (insert, select)`
+      - [x] `--as        (insert, select, import, export)`
       - [ ] `--hidden    (insert)`
       - [ ] `--null      (select)`
+      - [X] `--encrypt   (import, export)`
+      - [X] `--decrypt   (import, export)`
       - [ ] `--clipboard (select)`
       - [ ] `--secret    (insert)`
