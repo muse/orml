@@ -109,7 +109,7 @@ function _argv {
 }
 
 case "$ORML_COMMAND" in
-    help|import|export|list|install|insert|select|hide|unhide|drop)
+    import|export|list|install|insert|select|hide|unhide|drop)
         _argv "$@" && "_${ORML_COMMAND}" ;;
     *)
         echo "$ORML_COMMAND isn't a valid command, try $ orml help"

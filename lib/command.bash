@@ -20,12 +20,8 @@
 
 source lib/helper.bash
 
-function _test {
-    ./test/*.test.bash
-}
-
 function _list {
-    tree -Cal -I "keys" --prune "$ORML_STORE"
+    tree -la -CI "${ORML_KEYS##*/}" --prune "$ORML_STORE"
 }
 
 function _install {
@@ -44,6 +40,7 @@ function _export {
     _is_directory
     case $? in
         0)
+            is_true "$ORML_OPTS_ENCRYPT"
             case $? in
                 0)
                     _compress | _encrypt > "${ORML_ARGV[0]}.gpg"
@@ -78,21 +75,31 @@ function _import {
 }
 
 function _insert {
-    REPLY=${ORML_ARGV[1]:-$(_prompt "text, password or file: ")}
-    ! _is_file "${ORML_ARGV[0]}"
+    ! _is_path "${ORML_ARGV[0]}"
     case $? in
         0)
-            mkdir -p "$ORML_STORE/${ORML_ARGV[0]%/*}"
-            {
-                [[ -f "$REPLY" ]] && {
-                    _encrypt < "$REPLY"
-                } || {
-                    _encrypt <<< "$REPLY"
-                }
-            } > "$ORML_STORE/${ORML_ARGV[0]%/*}/${ORML_ARGV[0]##*/}"
-            exit 0 ;;
+            ! _is_path "$ORML_STORE/${ORML_ARGV[0]%/*}"
+            case $? in
+                0)
+                    [[ ${ORML_ARGV[1]} == "-" ]] \
+                        && ORML_ARGV[1]=$(cat)
+                    [[ -z "${ORML_ARGV[1]}" ]] \
+                        && ORML_ARGV[1]=$(_prompt "text, password or file: ")
+                    mkdir -p "$ORML_STORE/${ORML_ARGV[0]%/*}"
+                    {
+                        [[ -f "${ORML_ARGV[1]}" ]] \
+                            && _encrypt   < "${ORML_ARGV[1]}" \
+                            || _encrypt <<< "${ORML_ARGV[1]}"
+                    } > "$ORML_STORE/${ORML_ARGV[0]%/*}/${ORML_ARGV[0]##*/}"
+                    exit 0 ;;
+                1)
+
+                    echo "$ORML_STORE/${ORML_ARGV[0]%/*}/ already exists"
+                    exit 1 ;;
+            esac ;;
+
         1)
-            echo "$ORML_STORE/${ORML_ARGV[0]} already exists, use $ orml edit"
+            echo "$ORML_STORE/${ORML_ARGV[0]} already exists"
             exit 1 ;;
     esac
 }
@@ -161,7 +168,7 @@ function _drop {
                             rm "$ORML_HIDDEN/$(_hash "${ORML_ARGV[0]}")"
                             exit 0 ;;
                         1)
-                            echo "${ORML_ARGV[0]} doesn't exist as a path"
+                            echo "${ORML_ARGV[0]} doesn't exist"
                             exit 1 ;;
                     esac ;;
             esac ;;

@@ -62,21 +62,22 @@ function _prompt {
         read -rp "$1"
     fi
     echo "$REPLY"
-    return 0
+    return $?
 }
 
 function _hash {
-    if [[ -n "$1" ]]; then
-        cut '-d ' '-f1' < <(shasum <<< "$1")
-    fi
+    cut '-d ' '-f1' < <(shasum <<< "$1")
+    return $?
 }
 
-function _compress () (
+function _compress() (
     cd "$ORML_STORE" && tar -cf - .
+    return $?
 )
 
-function _decompress () (
+function _decompress() (
     cd "$ORML_STORE" && tar -xpf -
+    return $?
 )
 
 function _encrypt {
