@@ -65,6 +65,17 @@ function _prompt {
     return $?
 }
 
+function _accept {
+    if   [[ -z "$1" ]]; then
+        IN=$(_prompt "text, password (visible without --password) or file: ")
+    elif [[ $1 == "-" ]]; then
+        IN=$(cat)
+    else
+        IN="$1"
+    fi
+    return $?
+}
+
 function _hash {
     cut '-d ' '-f1' < <(shasum <<< "$1")
     return $?
@@ -81,25 +92,21 @@ function _decompress() (
 )
 
 function _encrypt {
-    _is_file "$ORML_KEYS"
-    case $? in
-        0)
-            gpg --encrypt -u "$ORML_OPTS_AS" -r "$ORML_OPTS_AS"
-            return 0 ;;
-        1)
-            echo "$ORML_KEYS doesn't exist, try doing $ orml install"
-            return 1 ;;
-    esac
+    if _is_file "$ORML_KEYS"; then
+        gpg --encrypt -u "$ORML_OPTS_AS" -r "$ORML_OPTS_AS"
+        return 0
+    else
+        echo "$ORML_KEYS doesn't exist, try doing $ orml install"
+        return 1
+    fi
 }
 
 function _decrypt {
-    _is_file "$ORML_KEYS"
-    case $? in
-        0)
-            xargs gpg --decrypt --batch --quiet --yes
-            return 0 ;;
-        1)
-            echo "$ORML_KEYS doesn't exist, try doing $ orml install"
-            return 1 ;;
-    esac
+    if _is_file "$ORML_KEYS"; then
+        xargs gpg --decrypt --batch --quiet --yes
+        return 0
+    else
+        echo "$ORML_KEYS doesn't exist, try doing $ orml install"
+        return 1
+    fi
 }

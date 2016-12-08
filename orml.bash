@@ -22,14 +22,12 @@ source lib/command.bash
 
 ORML_VERSION="0.1"
 ORML_NAME="$0"
-ORML_RUN="$(dirname $0)"
 ORML_COMMAND="$1"
 ORML_LONG="as:,hidden,force,clipboard,null,encrypt,decrypt"
 ORML_SHORT=":"
 ORML_ALLOC="${ORML_ALLOC:-$HOME}"
 ORML_STORE="${ORML_STORE:-$ORML_ALLOC/.orml}"
 ORML_KEYS="${ORML_KEYS:-$ORML_STORE/keys}"
-ORML_TRASH="${ORML_TRASH:-$ORML_STORE/.trash}"
 ORML_HIDDEN="${ORML_HIDDEN:-$ORML_STORE/.hidden}"
 
 ORML_OPTS_AS="$(head -1 "$ORML_KEYS" 2> /dev/null)"
@@ -105,13 +103,26 @@ function _argv {
     #   #: The next step however is to actually pass this variable to the
     #   #: commands so we can use the arguments ($n) instead of the
     #   #: variable (OMRL_ARGV[n]).
-    ORML_ARGV=($@)
+    #   #:
+    #   #: 2016-12-08 22:00
+    #   #: I take it back, THIS is probably the best way to export an array.
+    #   #: we reassign the function arguments to the ORML_ARGV array explictly.
+    #   #: Snapshot:
+    #   #: M=0
+    #   #: for N in "$@"
+    #   #: do
+    #   #:   ORML_ARGV[$M]="$N"
+    #   #:   M=$(($M + 1))
+    #   #: done
+    M=0 && for N in "$@"; do ORML_ARGV[$M]="$N" && M=$(($M + 1)); done
 }
 
 case "$ORML_COMMAND" in
     import|export|list|install|insert|select|hide|unhide|drop)
-        _argv "$@" && "_${ORML_COMMAND}" ;;
+        _argv "$@" && "_${ORML_COMMAND}" "${ORML_ARGV[@]}" <&0 ;;
+    test)
+        _argv "$@" && ORML_ALLOC=/tmp _test ;;
     *)
-        echo "$ORML_COMMAND isn't a valid command, try $ orml help"
+        echo "[$ORML_COMMAND] isn't a valid command"
         exit 1 ;;
 esac
