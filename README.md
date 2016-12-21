@@ -1,62 +1,30 @@
-## $ orml
+# $ orml - orml rules many lands.
+### What is it?
+Think of it like `pass`, except with more features and a more maintainable codebase.
+`orml` is a password/data manager which allows for various additional security
+and convenience features.
 
-I've finished the core commands, meaning that it is now functional. However,
-there's a few more things I've been wanting to implement mostly because they're
-convenient to have.
+### Installing
+Make is used for installing and removing orml. The commands `build` & `clean`
+can be used for this, build being the default.
+```
+$ git clone https://github.com/muse/orml
+$ make build
+```
 
-- [ ] There's no confirmation/error when you hide a password already hidden.
-      This means there is no validation to confirm if the file is already hidden
-      or when you tryto hide a already hidden file by inserting it again, after
-      you hid it.
-      ```
-        $ orml insert foo/bar "Hey world!"
-        $ orml hide foo/bar
-        $ orml insert foo/bar "I've been here..."
-        $ orml hide foo/bar   # We can't catch this any earlier, by the assumption
-                              # that someone will insert a file manually.
-      ```
+After that, you will need to install `orml` itself, before you do this make sure
+you have a GPG key. You can validate this with gpg --list-secret-keys which
+lists the secret keys available on the system, `orml` will use this to populate
+`~/.orml/keys`.
 
+```
+$ orml install
+```
 
-- [ ] I'd like to implement short reference codes to paths. I'm not sure what
-      I'd like here though, I initially thought about using the first 8 characters
-      from a different shasum than hidden, this however seems very obscure and
-      unlikely to be used often. I'll come back to this sometime.
-      ```
-      $ orml insert foo/bar "It doesn't really matter"
-      $ orml list
-      └── foo
-          └── [2c01b6] bar
-      $ orml select 2c01b6
-      ```
+You're all set to start using `orml`, before entering any commands validate that
+`~/.orml/keys` has your default key at the top. When the `--as` flag is omited
+`orml` will use this instead.
 
-- [ ] Adding to the issue above, perhaps shorter versions of the existing commands.
-
-      Long  |short
-      ------|-----
-      `insert`|`i`
-      `select`|`s`
-      `drop`  |`d`
-      `hide`  |`h`
-      `unhide`|`u`
-      `list`  |`l`
-
-      ```
-      $ orml i foo/bar "Hi"
-      $ orml s foo/bar
-      > Hi
-      ```
-
-- [ ] Adding tests as well, we need to make sure the commands function as intended.
-      The tests will be in `test` after cloning and will be exclusive to being ran
-      in the cloned directory (for now).
-
-- [X] I feel like the `_cipher` function can be enhanced.
-
-- [ ] Implement the existing and possibly new flags.
-      - [x] `--as        (insert, select, import, export)`
-      - [ ] `--hidden    (insert)`
-      - [ ] `--null      (select)`
-      - [X] `--encrypt   (import, export)`
-      - [X] `--decrypt   (import, export)`
-      - [ ] `--clipboard (select)`
-      - [ ] `--secret    (insert)`
+### How does it work?
+I haven't ported the .groff to Markdown or plain ASCII yet. I recommend using
+the provided manual with `$ man orml` or `$ orml help`.
