@@ -66,7 +66,9 @@ function _prompt {
 }
 
 function _accept {
-    if   [[ -z "$1" ]]; then
+    if   [[ $ORML_OPTS_SECRET -gt 0 ]]; then
+        IN=$(_secret "$ORML_OPTS_SECRET")
+    elif [[ -z "$1" ]]; then
         IN=$(_prompt "text, password (visible without --password) or file: ")
     elif [[ $1 == "-" ]]; then
         IN=$(cat)
@@ -82,14 +84,31 @@ function _hash {
 }
 
 function _compress() (
-    cd "$ORML_STORE" && tar -cf - .
+    cd "$ORML_STORE" && tar -czf - .
     return $?
 )
 
 function _decompress() (
-    cd "$ORML_STORE" && tar -xpf -
+    cd "$ORML_STORE" && tar -xzpf -
     return $?
 )
+
+function _secret() (
+    export LC_CTYPE=C
+    tr -dc "!'\#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_\`abcdefghijklmnopqrstuvwxyz{|" < /dev/urandom | head -c $1
+)
+
+function _clip {
+    tr -d "\n" | case $(uname) in
+        Linux)
+            xclip -selection CLIPBOARD
+            return 0 ;;
+        Darwin)
+            pbcopy
+            return 0 ;;
+    esac
+    return 1
+}
 
 function _encrypt {
     if _is_file "$ORML_KEYS"; then
@@ -103,7 +122,16 @@ function _encrypt {
 
 function _decrypt {
     if _is_file "$ORML_KEYS"; then
-        xargs gpg --decrypt --batch --quiet --yes
+        if _is_true "$ORML_OPTS_NULL"; then
+            local OUT=/dev/null
+        else
+            local OUT=/dev/fd/1
+        fi
+        if _is_true "$ORML_OPTS_CLIPBOARD"; then
+            xargs gpg --decrypt --batch --quiet --yes | tee >(_clip) > "$OUT"
+        else
+            xargs gpg --decrypt --batch --quiet --yes > "$OUT"
+        fi
         return 0
     else
         echo "$ORML_KEYS doesn't exist, try doing $ orml install"
