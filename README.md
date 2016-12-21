@@ -5,15 +5,15 @@ Think of it like `pass`, except with more features and a more maintainable codeb
 and convenience features.
 
 ### Installing
-Make is used for installing and removing orml. The commands `build` & `clean`
-can be used for this, build being the default.
+Make is used for installing and removing `orml`. The commands `build` & `clean`
+can be used for this, `build` being the default.
 ```
 $ git clone https://github.com/muse/orml
 $ make build
 ```
 
 After that, you will need to install `orml` itself, before you do this make sure
-you have a GPG key. You can validate this with gpg --list-secret-keys which
+you have a GPG key. You can validate this with `$ gpg --list-secret-keys` which
 lists the secret keys available on the system, `orml` will use this to populate
 `~/.orml/keys`.
 
