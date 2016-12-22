@@ -58,7 +58,7 @@ function _export {
 
 function _import {
     if is_directory; then
-        if _is_true "$ORML_OPTS_DECRYPT"; then
+        if (_is_true "$ORML_OPTS_DECRYPT" || [[ "$1" == *.gpg ]]) &> /dev/null; then
             _decrypt < "$1" | _decompress
         fi
         _decompress < "$1"
