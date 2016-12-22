@@ -27,7 +27,7 @@ function _help {
 function _list {
     case "$1" in
         @hidden) tree -la -CI "${ORML_KEYS##*/}" --prune "$ORML_HIDDEN" ;;
-             "") tree -la -CI "${ORML_KEYS##*/}" --prune "$ORML_STORE" ;;
+          --|"") tree -la -CI "${ORML_KEYS##*/}" --prune "$ORML_STORE" ;;
               *) tree -la -CI "${ORML_KEYS##*/}" -P "*$1*" --matchdirs --prune "$ORML_STORE" ;;
     esac
     exit 0
