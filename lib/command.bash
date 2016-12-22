@@ -21,7 +21,7 @@
 source /usr/local/lib/orml/helper.bash
 
 function _help {
-    man orml || man ./usr/local/share/man/man1/orml.1
+    man orml || man ./usr/local/share/man/man1/orml.1 || exit 1
 }
 
 function _list {
