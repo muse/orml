@@ -1,8 +1,8 @@
-# $ orml - orml rules many lands.
+# Orml rules many lands.
 ### What is it?
-Think of it like `pass`, except with more features and a more maintainable codebase.
-`orml` is a password/data manager which allows for various additional security
-and convenience features.
+Think of it like `pass`, except with more features and a more maintainable
+codebase (no offense). `orml` is a password/data manager which allows for
+various additional security and convenience features.
 
 ### Installing
 Make is used for installing and removing `orml`. The commands `build` & `clean`
@@ -25,6 +25,16 @@ You're all set to start using `orml`, before entering any commands validate that
 `~/.orml/keys` has your default key at the top. When the `--as` flag is omited
 `orml` will use this instead.
 
-### How does it work?
-I haven't ported the .groff to Markdown or plain ASCII yet. I recommend using
-the provided manual with `$ man orml` or `$ orml help`.
+
+### Flags
+There's quite a few flags available and not every flag has a purpose in every
+command.
+
+`--flag`            | `command`                    |`man`
+--------------------|------------------------------|-----
+`--as [key]`        | `insert, export (--encrypt)` | Do not use the preferenced key from `~/.orml/keys | head -1`. Instead use the provided key, regardless of its existence in the `~/.orml/keys` file. This flag only applies to export when the `--encrypt` flag is also set.
+`--secret [length]` | `insert`                     | Ignore any user received input and use a /dev/urandom string consisting of all the printable ascii characters and the provided length.
+`--encrypt`         | `export`                     | After creating the tar.gz, encrypt the tarball with either the preferenced key, or the key provided by `--as`.
+`--decrypt`         | `import`                     | Force decrypt the .tar.gz before attempting to import it.
+`--clipboard`       | `import, select`             | Copy the contents of the selected entry or imported tarball to the clipboard.
+`--null`            | `import, select`             | Don't show or do anything.
