@@ -23,7 +23,7 @@ source /usr/local/lib/orml/command.bash
 ORML_VERSION="0.4"
 ORML_NAME="$0"
 ORML_COMMAND="${1:-list}"
-ORML_LONG="as:,secret:,hidden,clipboard,null,encrypt,decrypt"
+ORML_LONG="as:,secret:,hidden,password,clipboard,null,encrypt,decrypt"
 ORML_SHORT=":"
 ORML_ALLOC="${ORML_ALLOC:-$HOME}"
 ORML_STORE="${ORML_STORE:-$ORML_ALLOC/.orml}"
@@ -62,6 +62,9 @@ function _argv {
                 shift 1 ;;
             --hidden)
                 ORML_OPTS_HIDDEN=true
+                shift 1 ;;
+            --password)
+                ORML_OPTS_PASSWORD=true
                 shift 1 ;;
             --clipboard)
                 ORML_OPTS_CLIPBOARD=true
