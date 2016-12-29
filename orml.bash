@@ -20,7 +20,7 @@
 
 source /usr/local/lib/orml/command.bash
 
-ORML_VERSION="0.2"
+ORML_VERSION="0.4"
 ORML_NAME="$0"
 ORML_COMMAND="${1:-list}"
 ORML_LONG="as:,secret:,hidden,clipboard,null,encrypt,decrypt"
@@ -52,7 +52,7 @@ function _argv {
                 ORML_OPTS_AS="$2"
                 shift 2 ;;
             --secret)
-                ORML_OPTS_SECRET="${2:-32}"
+                ORML_OPTS_SECRET="$2"
                 shift 2 ;;
             --encrypt)
                 ORML_OPTS_ENCRYPT=true
@@ -79,11 +79,11 @@ function _argv {
                 exit 1 ;;
         esac
     done
-    M=0 && for N in "$@"; do ORML_ARGV[$M]="$N" && M=$(($M + 1)); done
+    local M=0 N= && for N in "$@"; do ORML_ARGV[$M]="$N" && M=$(($M + 1)); done
 }
 
 case "$ORML_COMMAND" in
-    help|import|export|list|install|insert|select|hide|unhide|drop)
+    version|help|import|export|list|install|insert|select|hide|unhide|drop)
         _argv "$@" && "_${ORML_COMMAND}" "${ORML_ARGV[@]}" <&0 ;;
     *)
         echo "[$ORML_COMMAND] isn't a valid command"
