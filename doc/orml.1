@@ -1,4 +1,4 @@
-.TH orml 1 "2016-12-21 22:37" "0.2"
+.TH orml 1 "2016-12-21 22:37" "0.4"
 .SH NAME
 orml - orml rules many lands.
 .SH SYNOPSIS
@@ -29,121 +29,83 @@ orml - orml rules many lands.
 .I [arguments...]
 
 .SH DESCRIPTION
-.B orml
-is a multifunctional (encrypted) data manager. The general purpose is to secure
-your passwords & private keys. It does however accept files directly when
-they're provided, meaning it is easy to store photos, videos & other personal
-artifacts.
+Think of it like `pass`, except with more features and a more maintainable
+codebase. `orml` is a password/data manager which allows for
+various additional security and convenience features.
 
-.SH OPTIONS
+.SH COMMNADS
 .TP
 .B install
-.B orml
-will build the store rather than all of the dependencies. The store
-location will be ~/.orml by default, but can be modified by setting ORML_*
-variables (at own risk, this requires much more testing).
+If you haven't read this #installing section in the README, I recommend it.
 
 .TP
 .BI import " [store]"
-.B import
-a tarball or gpg file resembling a logical directory and file structure. A path
-found will treat its
-.I init
-as directories, and its
-.I last
-as the file.
-All found directories are created or reused dependent on the existing
-directories in ~/.orml. All the new files found are added, the duplicate files
-will be overwritten by their import.
-When a gpg file is provided you need to tell
-.B orml
-to decrypt it first by specifying the
-.I --decrypt
-flag.
+Import a tarball or gpg file resembling a logical ordering structure. All found
+directories are created or reused dependent on the existing directories in ~/.orml.
+All the new files found are added, the duplicate files will be overwritten by their
+import. When a gpg file is provided
+.I without
+extension, you need to tell `orml` to decrypt it first by specifying the
+`--decrypt` flag.
 
 .TP
 .BI export " [path]"
-.B export
-everything in ~/.orml by making it a tarball, writing it to path. You can
-additionally encrypt it with the
-.I --encrypt
-flag, this can be used in combination with the
-.I --as
-.B [key].
+Export everything in ~/.orml by making it a tarball, writing it to the provided file.
+You can additionally encrypt it with the `--encrypt` flag, this can be used in
+combination with the `--as [key]`.
 
 .TP
 .BI insert " [path] [- | *]"
-.B insert
-and encrypt a new file, text message or secure/private key. The key used
-to encrypt this entry is taken from ~/.orml/keys, it will take the first line
-in the file. This is also the way for you to set a preference on which key to
-use. You can specify a key which will overwrite the preference with
-.I --as
-.B [key].
-There are multiple ways to provide
-.B insert
-with data by changing the second argument:
+Insert and encrypt a new file, text message or secure/private key. The key used
+to encrypt this entry is taken from ~/.orml/keys by default, it will take the
+first line in the file. This is also the way for you to set a preference on
+which key to use. You can specify a key which will overwrite the preference
+with `--as [key]`.
 
-.IP *
-Omitting it, which will spawn a prompt. This prompt will not visibly hide user
-input without the
-.I --password
-flag.
+There are multiple ways to provide insert with data, this is done by changing
+the second argument.
 
-.IP *
-Supplying a single dash, telling
-.B orml
-to read from standard input, instead of using the arguments.
-
-.IP *
-Specifying the
-.I --secret
-.B [length]
-flag, this will use a /dev/urandom string with a printable ascii character set
-and the provided length. When the length is omitted, 32 is used instead.
-
-.IP *
-Anything else which doesn't apply to the previous clauses is initially treated
-as a file path. If this ends up not being a valid path, it is interpret as text.
+  * Omitting it, which will spawn a prompt. This prompt will not visibly hide user input
+    without the `--password` flag
+  * Supplying a single dash, telling `orml` to read from standard input instead
+    of using the arguments
+  * Specifying the `--secret [length]` flag, this will use a /dev/urandom string
+    using the printable ascii character set and the provided length
+  * Anything else which doesn't apply to the previous clauses is initially
+    treated as a file path. If this ends up not being a valid path, it is interpret
+    as text.
 
 .TP
 .BI select " [path]"
-.B select
-and decrypt a existing entry. You don't need to specify a key, gpg will
-identify if the required key is available by itself. It's possible to suppress
-any output to standard output with the
-.I --null
-flag. Additionally you can use the
-.I --clipboard
-flag to copy the contents of file to your clipboard.
+Select and decrypt a existing entry. You don't need to specify a key, gpg will
+identify if the required key is available by itself. It is possible to suppress
+any output to standard output with the `--null` flag. Additionally you can use
+the `--clipboard` flag to copy the contents of entry to your clipboard.
 
 .TP
 .BI list " [@hidden | [pattern | []]]"
-.B list
-entries. When no arguments are specified, all of the entries will be list.
-When a single argument matching
-.I @hidden
-is specified, only ~/.orml/.hidden will be listed. Any other arguments will be
-used to pattern match entries, and list those exclusively.
+List entries optionally based on the provided argument.
+
+  * When no arguments are specified, all of the entries will be list
+  * When a single argument matching `@hidden` is specified, only ~/.orml/.hidden will be listed
+  * Any other arguments will be used to pattern match entries, and list those exclusively
 
 .TP
 .BI hide " [path]"
 .B hide
-the matching entry by hashing the relative path, and move it to
-~/.orml/hidden afterwards. You can still access this entry like you normally
-would with select. Think of it like the path is becoming part of the master key.
+Hide the matching entry. the file is then moved to ~/.orml/hidden with the hash
+of the relative path as its new filename. You can still access this entry like
+you normally would with select.
 
 .TP
 .BI unhide " [path]"
-.B unhide
-the matching hidden entry by replacing the hash with the provided matching
-pattern. The pattern (path) will be interpret the same way it was set initially.
+Unhide the matching hidden entry by replacing the hash with the provided matching
+relative path, it will be interpret the same way it was set initially.
 
 .TP
 .BI drop " [path]"
-.B drop
-the matching entry, hidden entry or directory. There is no fail safe when using
-drop. It should be used with caution, think twice before deleting something.
+Drop the matching entry, hidden entry or directory. There is no confirmation when
+using drop. It should be used with caution, think twice before deleting something.
 
 .SH BUGS
 Anything that isn't like it should be can be submitted as an issue. This
@@ -151,5 +113,4 @@ including additional features, a different implementation of a existing
 functionality and typo's.
 
 .SH AUTHOR
-Mirko van der Waal
-.I <mvdw at airmail dot cc>
+Mirko van der Waal <mvdw at airmail dot cc>
