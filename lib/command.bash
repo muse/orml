@@ -20,6 +20,10 @@
 
 source /usr/local/lib/orml/helper.bash
 
+function _version {
+    echo "$ORML_VERSION"
+}
+
 function _help {
     man orml || man ./usr/local/share/man/man1/orml.1 || exit 1
 }
@@ -59,10 +63,11 @@ function _export {
 function _import {
     if _is_directory; then
         if (_is_true "$ORML_OPTS_DECRYPT" || [[ "$1" == *.gpg ]]) &> /dev/null; then
-            _decrypt < "$1" | _decompress
+            _decrypt <<< "$1" | _decompress
+            exit $?
         fi
         _decompress < "$1"
-        exit 0
+        exit $?
     fi
     echo "$ORML_STORE doesn't exist, try doing $ orml install"
     exit 1
