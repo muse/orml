@@ -49,10 +49,14 @@ function _is_hidden {
 }
 
 function _confirm {
-    read -rp "$1 [y/N]"
-    if [[ "$REPLY" == [yY]* ]]; then
+    if _is_true "$ORML_OPTS_FORCE"; then
         return 0
-    fi; return 1
+    else
+        read -rp "$1 [y/N]"
+        if [[ "$REPLY" == [yY]* ]]; then
+            return 0
+        fi; return 1
+    fi
 }
 
 function _prompt {
