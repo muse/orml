@@ -20,10 +20,10 @@
 
 source /usr/local/lib/orml/command.bash
 
-ORML_VERSION="0.4"
+ORML_VERSION="0.5"
 ORML_NAME="$0"
 ORML_COMMAND="${1:-list}"
-ORML_LONG="as:,secret:,hidden,password,clipboard,null,encrypt,decrypt"
+ORML_LONG="as:,secret:,force,hidden,password,clipboard,null,encrypt,decrypt"
 ORML_SHORT=":"
 ORML_ALLOC="${ORML_ALLOC:-$HOME}"
 ORML_STORE="${ORML_STORE:-$ORML_ALLOC/.orml}"
@@ -66,6 +66,9 @@ function _argv {
             --password)
                 ORML_OPTS_PASSWORD=true
                 shift 1 ;;
+            --force)
+                ORML_OPTS_FORCE=true
+                shift 1 ;;
             --clipboard)
                 ORML_OPTS_CLIPBOARD=true
                 shift 1 ;;
@@ -78,7 +81,7 @@ function _argv {
                 shift 2
                 break ;;
             *)
-                echo "You've come where no man was to come"
+                printf "%s\n" "You've come where no man was to come"
                 exit 1 ;;
         esac
     done
@@ -89,6 +92,6 @@ case "$ORML_COMMAND" in
     version|help|import|export|list|install|insert|select|hide|unhide|drop)
         _argv "$@" && "_${ORML_COMMAND}" "${ORML_ARGV[@]}" <&0 ;;
     *)
-        echo "[$ORML_COMMAND] isn't a valid command"
+        printf "%s\n" "[$ORML_COMMAND] isn't a valid command"
         exit 1 ;;
 esac
