@@ -44,7 +44,7 @@ You're all set to start using `orml`, before entering any commands validate that
 `insert`  | Insert and encrypt a new file, text message or secure/private key. The key used to encrypt this entry is taken from ~/.orml/keys by default, it will take the first line in the file. This is also the way for you to set a preference on which key to use. You can specify a key which will overwrite the preference with `--as [key]`.  <br /><br /> There are multiple ways to provide insert with data, this is done by changing the second argument.  <br /> <ol> <li>Omitting it, which will spawn a prompt. This prompt will not visibly hide user input without the `--password` flag</li> <li>Supplying a single dash, telling `orml` to read from standard input instead of using the arguments</li><li>Specifying the `--secret [length]` flag, this will use a /dev/urandom string using the printable ascii character set and the provided length</li><li>Anything else which doesn't apply to the previous clauses is initially treated as a file path. If this ends up not being a valid path, it is interpret as text</li></ol>
 `select`  | Select and decrypt a existing entry. You don't need to specify a key, gpg will identify if the required key is available by itself. It is possible to suppress any output to standard output with the `--null` flag. Additionally you can use the `--clipboard` flag to copy the contents of entry to your clipboard.
 `list`    | List entries optionally based on the provided argument.<br /><br /><ol><li>When no arguments are specified, all of the entries will be list</li><li>When a single argument matching `@hidden` is specified, only ~/.orml/.hidden will be listed</li><li>Any other arguments will be used to pattern match entries, and list those exclusively</li></ol>
-`drop`    | Drop the matching entry, hidden entry or directory. There is no confirmation when using drop. It should be used with caution, think twice before deleting something.
+`drop`    | Drop the matching entry, hidden entry or directory. This will prompt a confirmation which can optionally be skipped with `--force`.
 `hide`    | Hide the matching entry. the file is then moved to ~/.orml/hidden with the hash of the relative path as its new filename. You can still access this entry like you normally would with select.
 `unhide`  | Unhide the matching hidden entry by replacing the hash with the provided matching relative path, it will be interpret the same way it was set initially.
 `install` | You should reference the [installing](/README.md#installing) section.
@@ -60,6 +60,7 @@ You're all set to start using `orml`, before entering any commands validate that
 `--encrypt`         | `export`         | After creating the tar.gz, encrypt the tarball with either the preferenced key, or the key provided by `--as`.
 `--decrypt`         | `import`         | Force decrypt the .tar.gz before attempting to import it.
 `--clipboard`       | `import, select` | Copy the contents of the selected entry or imported tarball to the clipboard.
+`--force`           | `drop`           | Don't prompt for confirmation when droping something.
 `--null`            | `import, select` | Don't show or do anything.
 
 ### Ideas and bugs

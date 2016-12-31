@@ -33,7 +33,7 @@ Think of it like `pass`, except with more features and a more maintainable
 codebase. `orml` is a password/data manager which allows for
 various additional security and convenience features.
 
-.SH COMMNADS
+.SH COMMANDS
 .TP
 .B install
 If you haven't read this #installing section in the README, I recommend it.
@@ -104,8 +104,8 @@ relative path, it will be interpret the same way it was set initially.
 
 .TP
 .BI drop " [path]"
-Drop the matching entry, hidden entry or directory. There is no confirmation when
-using drop. It should be used with caution, think twice before deleting something.
+Drop the matching entry, hidden entry or directory. This will prompt a
+confirmation which can optionally be skipped with `--force`.
 
 .SH BUGS
 Anything that isn't like it should be can be submitted as an issue. This
