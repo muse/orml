@@ -126,11 +126,11 @@ function _unhide {
 
 function _drop {
     if _is_file "$1"; then
-        rm "$ORML_STORE/$1"
+        _confirm "Drop $ORML_STORE/$1?"  && rm "$ORML_STORE/$1"
     elif _is_directory "$1"; then
-        rm -r "$ORML_STORE/$1"
+        _confirm "Drop $ORML_STORE/$1/?" && rm -r "$ORML_STORE/$1"
     elif _is_hidden "$1"; then
-        rm "$ORML_HIDDEN/$(_hash "$1")"
+        _confirm "Drop $ORML_HIDDEN/$(_hash $1)?" && rm "$ORML_HIDDEN/$(_hash "$1")"
     else
         echo "$1 doesn't exist"
         exit 1
