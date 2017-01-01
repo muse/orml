@@ -20,7 +20,7 @@
 
 source /usr/local/lib/orml/command.bash
 
-ORML_VERSION="0.5"
+ORML_VERSION="0.6"
 ORML_NAME="$0"
 ORML_COMMAND="${1:-list}"
 ORML_LONG="as:,secret:,force,hidden,password,clipboard,null,encrypt,decrypt"
@@ -89,7 +89,7 @@ function _argv {
 }
 
 case "$ORML_COMMAND" in
-    version|help|import|export|list|install|insert|select|hide|unhide|drop)
+    version|help|move|import|export|list|install|insert|select|hide|unhide|drop)
         _argv "$@" && "_${ORML_COMMAND}" "${ORML_ARGV[@]}" <&0 ;;
     *)
         printf "%s\n" "[$ORML_COMMAND] isn't a valid command"

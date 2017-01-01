@@ -99,7 +99,7 @@ function _decompress() (
 
 function _secret() (
     export LC_CTYPE=C
-    tr -dc "!'\#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_\`abcdefghijklmnopqrstuvwxyz{|" < /dev/urandom | head -c $1
+    tr -dc "!'\#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_\`abcdefghijklmnopqrstuvwxyz{|" < /dev/urandom | head -c "$1"
 )
 
 function _clip {

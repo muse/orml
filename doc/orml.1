@@ -39,22 +39,6 @@ various additional security and convenience features.
 If you haven't read this #installing section in the README, I recommend it.
 
 .TP
-.BI import " [store]"
-Import a tarball or gpg file resembling a logical ordering structure. All found
-directories are created or reused dependent on the existing directories in ~/.orml.
-All the new files found are added, the duplicate files will be overwritten by their
-import. When a gpg file is provided
-.I without
-extension, you need to tell `orml` to decrypt it first by specifying the
-`--decrypt` flag.
-
-.TP
-.BI export " [path]"
-Export everything in ~/.orml by making it a tarball, writing it to the provided file.
-You can additionally encrypt it with the `--encrypt` flag, this can be used in
-combination with the `--as [key]`.
-
-.TP
 .BI insert " [path] [- | *]"
 Insert and encrypt a new file, text message or secure/private key. The key used
 to encrypt this entry is taken from ~/.orml/keys by default, it will take the
@@ -91,6 +75,22 @@ List entries optionally based on the provided argument.
   * Any other arguments will be used to pattern match entries, and list those exclusively
 
 .TP
+.BI export " [path]"
+Export everything in ~/.orml by making it a tarball, writing it to the provided file.
+You can additionally encrypt it with the `--encrypt` flag, this can be used in
+combination with the `--as [key]`.
+
+.TP
+.BI drop " [path]"
+Drop the matching entry, hidden entry or directory. This will prompt a
+confirmation which can optionally be skipped with `--force`.
+
+.TP
+.BI move " [from] [to]"
+Move the first entry to the second location. When the second location exists,
+a prompt will appear which can be skipped with `--force`.
+
+.TP
 .BI hide " [path]"
 .B hide
 Hide the matching entry. the file is then moved to ~/.orml/hidden with the hash
@@ -103,9 +103,18 @@ Unhide the matching hidden entry by replacing the hash with the provided matchin
 relative path, it will be interpret the same way it was set initially.
 
 .TP
-.BI drop " [path]"
-Drop the matching entry, hidden entry or directory. This will prompt a
-confirmation which can optionally be skipped with `--force`.
+.BI import " [store]"
+Import a tarball or gpg file resembling a logical ordering structure. All found
+directories are created or reused dependent on the existing directories in ~/.orml.
+All the new files found are added, the duplicate files will be overwritten by their
+import. When a gpg file is provided
+.I without
+extension, you need to tell `orml` to decrypt it first by specifying the
+`--decrypt` flag.
+
+.TP
+.B version
+Display the current version.
 
 .SH BUGS
 Anything that isn't like it should be can be submitted as an issue. This
