@@ -1,5 +1,5 @@
-# These are not ready yet, and are thus not pushed.
-test/
+# Experimental code.
+/mess
 
-# Don't send a symlink by accident.
+# Don't push a symlink by accident.
 orml

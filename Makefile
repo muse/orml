@@ -1,4 +1,4 @@
-#!/usr/bin/make
+#!/usr/bin/env make
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,33 +18,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-define validate_existence
-  if [ $(1) $(2) ]; then $(3); else $(4); fi;
-endef
+# from, to, as.
+BIN_F := .
+BIN_T := /usr/local/bin
+BIN_A := orml
+DOC_F := doc
+DOC_T := /usr/local/share/man/man1
+DOC_A := orml.1
+LIB_F := lib
+LIB_T := /usr/local/lib/orml
+LIB_A := *
 
-BIN_FROM :=./
-BIN_TO   :=/usr/local/bin
-BIN_AS   :=orml.bash
-DOC_FROM :=doc
-DOC_TO   :=/usr/local/share/man/man1
-DOC_AS   :=orml.1
-LIB_FROM :=lib
-LIB_TO   :=/usr/local/lib/orml
-LIB_AS   :=*
-
-build:
-	$(call \
-	  validate_existence, \
-	  ! -d, $(LIB_TO),    \
-	  mkdir $(LIB_TO),    \
-	  :)
-	cp $(LIB_FROM)/$(LIB_AS) $(LIB_TO)
-	cp $(DOC_FROM)/$(DOC_AS) $(DOC_TO)
-	cp $(BIN_FROM)/$(BIN_AS) $(BIN_TO)/orml
-	chmod +r $(DOC_TO)/$(DOC_AS)
-	chmod +x $(BIN_TO)/orml
+install:
+	if [ ! -d $(LIB_T) ]; then mkdir $(LIB_T); fi
+	cp $(LIB_F)/$(LIB_A) $(LIB_T)
+	cp $(DOC_F)/$(DOC_A) $(DOC_T)
+	cp $(BIN_F)/$(BIN_A).bash $(BIN_T)/$(BIN_A)
+	chmod +r $(DOC_T)/$(DOC_A)
+	chmod +x $(BIN_T)/$(BIN_A)
 
 clean:
-	rm $(BIN_TO)/orml
-	rm -r $(LIB_TO)
-	rm $(DOC_TO)/$(DOC_AS)
+	rm $(BIN_T)/$(BIN_A)
+	rm -r $(LIB_T)
+	rm $(DOC_T)/$(DOC_A)
+
+.PHONY: install clean
