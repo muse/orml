@@ -18,34 +18,42 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set -o pipefail
+
+# TODO:
+#   Don't hardcode the library path, changing the Makefile will break orml entirely.
+source /usr/local/lib/orml/util.bash
 source /usr/local/lib/orml/command.bash
 
-ORML_VERSION="0.6"
+ORML_VERSION="0.9"
 ORML_NAME="$0"
 ORML_COMMAND="${1:-list}"
-ORML_LONG="as:,secret:,force,hidden,password,clipboard,null,encrypt,decrypt"
+ORML_LONG="as:,passphrase:,secret:,force,hidden,password,clipboard,null,encrypt,decrypt"
 ORML_SHORT=":"
 ORML_ALLOC="${ORML_ALLOC:-$HOME}"
 ORML_STORE="${ORML_STORE:-$ORML_ALLOC/.orml}"
+ORML_TEMPLATE=${ORML_TEMPLATE:-$ORML_STORE/template}
 ORML_KEYS="${ORML_KEYS:-$ORML_STORE/keys}"
 ORML_HIDDEN="${ORML_HIDDEN:-$ORML_STORE/.hidden}"
 
 ORML_OPTS_AS="$(head -1 "$ORML_KEYS" 2> /dev/null)"
 ORML_OPTS_SECRET=-1
+ORML_OPTS_PASSPHRASE=
 ORML_OPTS_NULL=false
 ORML_OPTS_ENCRYPT=false
 ORML_OPTS_DECRYPT=false
 ORML_OPTS_CLIPBOARD=false
 ORML_OPTS_HIDDEN=false
 
-export GPG_TTY=$(tty 2> /dev/null)
+export GPG_TTY=
+GPG_TTY=$(tty 2> /dev/null)
 
 function _argv {
-    eval set -- $(getopt \
+    eval set -- "$(getopt \
                 -o "$ORML_SHORT" \
                 -l "$ORML_LONG" \
                 -n "$ORML_NAME" \
-                -- "$@")
+                -- "$@")"
     while :; do
         case "$1" in
             --as)
@@ -53,6 +61,9 @@ function _argv {
                 shift 2 ;;
             --secret)
                 ORML_OPTS_SECRET="$2"
+                shift 2 ;;
+            --passphrase)
+                ORML_OPTS_PASSPHRASE="$2"
                 shift 2 ;;
             --encrypt)
                 ORML_OPTS_ENCRYPT=true
@@ -81,17 +92,27 @@ function _argv {
                 shift 2
                 break ;;
             *)
-                printf "%s\n" "You've come where no man was to come"
+                echo >&2 "Here be dragons."
                 exit 1 ;;
         esac
     done
-    local M=0 N= && for N in "$@"; do ORML_ARGV[$M]="$N" && M=$(($M + 1)); done
+    for ARG; do
+        ORML_ARGV+=("$ARG")
+    done
 }
 
+# TODO:
+#   Write error messages when not enough arguments are found.
+_argv "$@"
 case "$ORML_COMMAND" in
-    version|help|move|import|export|list|install|insert|select|hide|unhide|drop)
-        _argv "$@" && "_${ORML_COMMAND}" "${ORML_ARGV[@]}" <&0 ;;
+    version|help|install|list)
+        (( ${#ORML_ARGV[@]} >= 0 )) || exit 1 ;;
+    select|insert|export|hide|unhide|import|drop)
+        (( ${#ORML_ARGV[@]} >= 1 )) || exit 1 ;;
+    move)
+        (( ${#ORML_ARGV[@]} >= 2 )) || exit 1 ;;
     *)
-        printf "%s\n" "[$ORML_COMMAND] isn't a valid command"
+        echo >&2 "$ORML_COMMAND isn't a valid command"
         exit 1 ;;
 esac
+"_$ORML_COMMAND" "${ORML_ARGV[@]}" <&0

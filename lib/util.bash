@@ -6,7 +6,7 @@
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-#
+
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
 #
@@ -70,7 +70,7 @@ function _prompt {
 }
 
 function _accept {
-    if   [[ $ORML_OPTS_SECRET -gt 0 ]]; then
+    if [[ $ORML_OPTS_SECRET -gt 0 ]]; then
         IN=$(_secret "$ORML_OPTS_SECRET")
     elif [[ -z "$1" ]]; then
         IN=$(_prompt "text, password (visible without --password) or file: ")
@@ -87,58 +87,51 @@ function _hash {
     return $?
 }
 
-function _compress() (
-    cd "$ORML_STORE" && tar -czf - .
+function _compress {
+    (cd "$ORML_STORE" && tar -czf - .)
     return $?
-)
+}
 
-function _decompress() (
-    cd "$ORML_STORE" && tar -xzpf -
+function _decompress {
+    (cd "$ORML_STORE" && tar -xzpf -)
     return $?
-)
+}
 
-function _secret() (
-    export LC_CTYPE=C
-    tr -dc "!'\#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_\`abcdefghijklmnopqrstuvwxyz{|" < /dev/urandom | head -c "$1"
-)
+function _secret {
+    LC_CTYPE=C tr -dc "!'\#$%&()*+,-./[0-9]:;<=>?@[A-Z][\]^_\`[a-z]{|" < /dev/urandom | head -c "$1"
+    return $?
+}
 
 function _clip {
-    tr -d "\n" | case $(uname) in
-        Linux)
-            xclip -selection CLIPBOARD
-            return 0 ;;
-        Darwin)
-            pbcopy
-            return 0 ;;
+    case $(command uname -s) in
+         Linux) xclip -selection CLIPBOARD ;;
+        Darwin) pbcopy ;;
     esac
-    return 1
+    return $?
 }
 
 function _encrypt {
-    if _is_file "$ORML_KEYS"; then
-        gpg --encrypt -u "$ORML_OPTS_AS" -r "$ORML_OPTS_AS"
-        return 0
-    else
-        echo "$ORML_KEYS doesn't exist, try doing $ orml install"
-        return 1
-    fi
+    gpg --encrypt -u "$ORML_OPTS_AS" -r "$ORML_OPTS_AS"
+    return $?
 }
 
 function _decrypt {
-    if _is_file "$ORML_KEYS"; then
-        if _is_true "$ORML_OPTS_NULL"; then
-            local OUT=/dev/null
-        else
-            local OUT=/dev/fd/1
-        fi
-        if _is_true "$ORML_OPTS_CLIPBOARD"; then
-            xargs gpg --decrypt --batch --quiet --yes | tee >(_clip) > "$OUT"
-        else
-            xargs gpg --decrypt --batch --quiet --yes > "$OUT"
-        fi
-        return 0
-    else
-        echo "$ORML_KEYS doesn't exist, try doing $ orml install"
-        return 1
-    fi
+    case ${#ORML_OPTS_PASSPHRASE} in
+        0) gpg --batch --quiet --decrypt "$(cat)" ;;
+        *) gpg --batch --quiet --passphrase "$ORML_OPTS_PASSPHRASE" --decrypt "$(cat)" ;;
+    esac | case "$ORML_COMMAND" in
+        import) cat ;;
+             *) {
+                    read -r value
+                    stdout=/dev/fd/1
+                    if _is_true "$ORML_OPTS_NULL"; then
+                        stdout=/dev/null
+                    fi
+                    if _is_true "$ORML_OPTS_CLIPBOARD"; then
+                        printf "%s" "$value" | _clip
+                    fi
+                    printf "%s" "$value" > "$stdout"
+                } ;;
+    esac
+    return $?
 }
