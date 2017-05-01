@@ -48,6 +48,12 @@ function _is_hidden {
     fi; return 1
 }
 
+function _is_hook {
+    if [[ -f "$ORML_HOOKS/$1" ]]; then
+        return 0
+    fi; return 1
+}
+
 function _confirm {
     if _is_true "$ORML_OPTS_FORCE"; then
         return 0
