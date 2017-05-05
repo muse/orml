@@ -118,8 +118,8 @@ case "$ORML_COMMAND" in
         exit 1 ;;
 esac
 
-# TODO:
-#   Capture the command exit code and exit with that instead of discarding it.
 _hook:run "${ORML_COMMAND}:before"
 ("_$ORML_COMMAND" "${ORML_ARGV[@]}" <&0)
+error=$?
 _hook:run "${ORML_COMMAND}:after"
+exit $error

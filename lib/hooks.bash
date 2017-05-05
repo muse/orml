@@ -23,33 +23,37 @@ function _hook:run {
 }
 
 function _hook:add {
-    if _is_hook "$1"; then
-        echo >&2 "$1 is already a hook"
-        exit 1
+    if ! _is_hook "$1"; then
+        echo "$2" > "$ORML_HOOKS/$1"
+        exit $?
     fi
-    echo "$2" > "$ORML_HOOKS/$1"
-    exit 0
+    echo >&2 "$1 is already a hook"
+    exit 1
 }
 
 function _hook:drop {
-    if ! _is_hook "$1"; then
-        echo >&2 "$1 isn't a hook"
-        exit 1
+    if _is_hook "$1"; then
+        _confirm "$1?" && rm "$ORML_HOOKS/$1"
+        exit $?
     fi
-    _confirm "$1?" && rm "$ORML_HOOKS/$1"
-    :;
+    echo >&2 "$1 isn't a hook"
+    exit 1
 }
 
 function _hook:disable {
     if _is_hook "$1"; then
         mv "$ORML_HOOKS/$1" "$ORML_HOOKS/%$1"
+        exit $?
     fi
-    :;
+    echo >&2 "$1 isn't enabled or doesn't exist"
+    exit 1
 }
 
 function _hook:enable {
     if _is_hook "%$1"; then
         mv "$ORML_HOOKS/%$1" "$ORML_HOOKS/$1"
+        exit $?
     fi
-    :;
+    echo >&2 "$1 isn't disabled or doesn't exist"
+    exit 1
 }
