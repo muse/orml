@@ -29,7 +29,7 @@ function _help {
 }
 
 function _install {
-    mkdir -p "$ORML_STORE" "$ORML_HIDDEN"
+    mkdir -p "$ORML_STORE" "$ORML_HIDDEN" "$ORML_HOOKS"
     if _is_file "$ORML_KEYS"; then
         if ! _confirm "Do you wish to overwrite $ORML_KEYS?"; then
             exit 1
@@ -45,6 +45,7 @@ function _install {
 function _list {
     case "$1" in
         @hidden) tree -la -CI "${ORML_KEYS##*/}" --prune "$ORML_HIDDEN" ;;
+         @hooks) tree -la -CI "${ORML_KEYS##*/}" --prune "$ORML_HOOKS" ;;
           --|"") tree -la -CI "${ORML_KEYS##*/}" --prune "$ORML_STORE" ;;
               *) tree -la -CI "${ORML_KEYS##*/}" -P "*$1*" --matchdirs --prune "$ORML_STORE" ;;
     esac
